@@ -1,0 +1,15 @@
+<!-- Inside forecast.html -->
+<ul>
+    {% for forecast in forecasts %}
+        <li>
+            <strong>Time:</strong> {{ forecast.time }}<br>
+            <strong>Conditions:</strong><br>
+            - Water Temperature: {{ forecast.conditions.waterTemperature }} °C<br>
+            - Wave Height: {{ forecast.conditions.waveHeight }} meters<br>
+            - Wave Period: {{ forecast.conditions.wavePeriod }} seconds<br>
+            - Wind Speed: {{ forecast.conditions.windSpeed }} m/s<br>
+        </li>
+    {% else %}
+        <li>No forecast data available.</li>
+    {% endfor %}
+</ul>
