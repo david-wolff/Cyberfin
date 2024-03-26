@@ -1,15 +1,121 @@
-<!-- Inside forecast.html -->
-<ul>
-    {% for forecast in forecasts %}
-        <li>
-            <strong>Time:</strong> {{ forecast.time }}<br>
-            <strong>Conditions:</strong><br>
-            - Water Temperature: {{ forecast.conditions.waterTemperature }} °C<br>
-            - Wave Height: {{ forecast.conditions.waveHeight }} meters<br>
-            - Wave Period: {{ forecast.conditions.wavePeriod }} seconds<br>
-            - Wind Speed: {{ forecast.conditions.windSpeed }} m/s<br>
-        </li>
-    {% else %}
-        <li>No forecast data available.</li>
-    {% endfor %}
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Surf Forecast</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e0f7fa; /* Light blue background */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Stack child elements vertically */
+            align-items: center; /* Center-align child elements horizontally */
+        }
+        
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Create a responsive grid */
+            gap: 20px; /* Space between grid items */
+        }
+        .feedback-container {
+            width: 100%; /* Ensure the container takes full width */
+            padding: 20px;
+            margin-top: 30px; /* Add some space between the forecasts and the form */
+            background-color: #f0f0f0; /* Light background for the form area */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: adds some shadow for depth */
+        }
+        
+        .feedback-form {
+            max-width: 600px; /* Or any other maximum width */
+            margin: auto; /* Center the form in the feedback container */
+            display: flex;
+            flex-direction: column; /* Stack form fields vertically */
+        }
+        
+        .feedback-form h2 {
+            color: #0277bd; /* Style the header of the form */
+        }
+        
+        .feedback-form label, .feedback-form input, .feedback-form input[type=submit] {
+            margin-top: 10px;
+            width: 100%; /* Full-width form fields */
+        }
+        
+        .feedback-form input[type=submit] {
+            margin-top: 20px;
+            background-color: #0277bd;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        
+        h1 {
+            grid-column: 1 / -1; /* Make the header span all columns */
+            color: #01579b;
+            text-align: center;
+            margin-bottom: 20px; /* Added space below the header */
+        }
+
+        .forecast {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column; /* Stack the content vertically */
+            justify-content: space-between; /* Distribute space between items */
+        }
+
+        .forecast strong {
+            color: #004c8c;
+            margin-bottom: 10px;
+        }
+
+        .conditions {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Today's Surf Forecast</h1>
+        {% for forecast in forecasts %}
+            <div class="forecast">
+                <strong>Time:</strong> {{ forecast.time }}<br>
+                <strong>Conditions:</strong><br>
+                - Water Temperature: {{ forecast.conditions.waterTemperature }} °C<br>
+                - Wave Direction: {{ forecast.conditions.waveDirection }} degrees<br>
+                - Wave Height: {{ forecast.conditions.waveHeight }} meters<br>
+                - Wave Period: {{ forecast.conditions.wavePeriod }} seconds<br>
+                - Wind Direction: {{ forecast.conditions.windDirection }} degrees<br>
+                - Wind Speed: {{ forecast.conditions.windSpeed }} m/s<br>
+            </div>
+        {% else %}
+            <div>No forecast data available.</div>
+        {% endfor %}
+    </div> 
+    
+    
+    <div class="feedback-container">
+        <form action="/feedback" method="post" class="feedback-form">
+            <h2>Got barreled today?</h2>
+            <label for="spot">Spot:</label>
+            <input type="text" id="spot" name="spot" required>
+            <label for="time">Time (HH:MM):</label>
+            <input type="time" id="time" name="time" required>
+            <label for="fun_rate">Fun Rate (0-5):</label>
+            <input type="number" id="fun_rate" name="fun_rate" min="0" max="5" required>
+            <input type="submit" value="Submit Feedback">
+        </form>
+    </div>
+</body>
+
+</html>
