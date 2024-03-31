@@ -1,36 +1,45 @@
 from flask import Flask, render_template
 import json
-from datetime import datetime, timedelta
+import os
+from sendForecastRequest import get_and_store_forecast
+from filterRequest import average_noaa_conditions_to_file
 
 app = Flask(__name__)
 
-def retrieve_forecast_for_next_day(json_file_path):
-    current_datetime = datetime.now()
-    end_datetime = (current_datetime + timedelta(days=4)).replace(hour=23, minute=59, second=59)  # Plus four days
-    relevant_forecasts = []
-    with open(json_file_path, 'r') as file:
-        forecasts = json.load(file)
+def can_make_api_request(raw_data_file):
+    """
+    Checks if the application can make an API request without exceeding the quota.
+    """
+    if os.path.exists(raw_data_file):
+        with open(raw_data_file, 'r') as file:
+            data = json.load(file)
+            request_count = data['meta']['requestCount']
+            daily_quota = data['meta']['dailyQuota']
+            
+            if request_count < (daily_quota - 1):  # Ensuring we don't hit the quota
+                return True
+    # If the file doesn't exist or we've reached the quota, don't make a new request.
+    return False
 
-    for forecast in forecasts:
-        forecast_time = datetime.strptime(forecast['time'], '%d/%m/%Y - %I:%M %p')
-        if current_datetime <= forecast_time <= end_datetime:
-            relevant_forecasts.append(forecast)
-            if len(relevant_forecasts) >= 8:  # Limit to 8 forecasts
-                break
-
-    return relevant_forecasts
-
-
-def degrees_to_direction(degrees):
-    directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
-    index = round(degrees / (360. / len(directions)))
-    return directions[index % len(directions)]
+def initialize():
+    raw_data_file = "forecast_data.json"
+    processed_data_file = "noaa_filtered.json"
+    
+    if can_make_api_request(raw_data_file):
+        get_and_store_forecast(raw_data_file)
+        print("API request made and data updated.")
+    else:
+        print("API request limit reached. Using existing data.")
+    
+    average_noaa_conditions_to_file(raw_data_file, processed_data_file)
 
 @app.route('/')
 def home():
-    json_file_path = 'noaa_filtered.json' 
-    forecast_data = retrieve_forecast_for_next_day(json_file_path)
-    return render_template('forecast.html', forecasts=forecast_data)
+    with open("noaa_filtered.json", 'r') as file:
+        forecasts = json.load(file)
+    return render_template('forecast.html', forecasts=forecasts)
+
+initialize()
 
 if __name__ == "__main__":
     app.run(debug=True)

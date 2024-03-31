@@ -2,16 +2,12 @@ import json
 from datetime import datetime, timedelta
 
 def average_noaa_conditions_to_file(input_file_path, output_file_path):
-    #Times when conditions are checked
     key_times = ["02:00", "08:00", "12:00", "18:00"]
-    #Forecast Range
     current_datetime = datetime.now()
     end_datetime = current_datetime + timedelta(days=7)
 
-    #Dict for accumulating averages of data
     accumulated_data = {}
 
-    # Read the JSON data from the file
     with open(input_file_path, 'r') as file:
         data = json.load(file)
 
@@ -29,7 +25,6 @@ def average_noaa_conditions_to_file(input_file_path, output_file_path):
                     accumulated_data[formatted_timestamp][key] += hour[key]['noaa']
                 accumulated_data[formatted_timestamp]['count'] += 1
 
-    # Prepare the average data for output
     average_data = []
     for timestamp, values in accumulated_data.items():
         count = values.pop('count')

@@ -2,41 +2,44 @@ import json
 import requests
 import os
 import geocoder
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
+
+from datetime import datetime, timezone
 
 def update_needed(json_file_path):
     try:
         with open(json_file_path, 'r') as f:
             data = json.load(f)
-            latest_date = max(datetime.strptime(entry['time'], "%Y-%m-%dT%H:%M:%S+00:00") for entry in data['hours'])
-            return datetime.now() > latest_date
+            first_forecast_time = datetime.strptime(data['hours'][0]['time'], "%Y-%m-%dT%H:%M:%S+00:00").replace(tzinfo=timezone.utc)
+            today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+            return first_forecast_time < today
     except (FileNotFoundError, ValueError, KeyError, json.JSONDecodeError):
         return True
 
+
 def get_and_store_forecast(output_file): 
-    location = geocoder.ip('me')
-    lat, lng = location.latlng  
-    lat = round(lat, 3) 
-    lng = round(lng, 3)  
-    params = 'waterTemperature,wavePeriod,waveDirection,windDirection,windSpeed,waveHeight'
-    api_url = f"https://api.stormglass.io/v2/weather/point?lat={lat}&lng={lng}&params={params}"
-    headers = {
-        'Authorization': os.getenv('STORMGLASS_API_KEY')
-    }
-    
-    response = requests.get(api_url, headers=headers)
-       
-    if response.status_code == 200:
-        data = response.json()
+    try:
+        location = geocoder.ip('me')
+        lat, lng = location.latlng  
+        lat = round(lat, 3) 
+        lng = round(lng, 3)  
+        params = 'waterTemperature,wavePeriod,waveDirection,windDirection,windSpeed,waveHeight'
+        api_url = f"https://api.stormglass.io/v2/weather/point?lat={lat}&lng={lng}&params={params}"
+        headers = {'Authorization': os.getenv('STORMGLASS_API_KEY')}
         
+        response = requests.get(api_url, headers=headers, timeout=10)
+        response.raise_for_status()  
+        data = response.json()
         with open(output_file, 'w') as file: 
             json.dump(data, file, indent=4)
-        print(f"Forecast data has been saved to {output_file}") 
-    else:
-        print(f"Failed to get forecast data: {response.status_code}")
+        logging.info(f"Forecast data has been saved to {output_file}") 
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Failed to get forecast data: {e}")
 
 if __name__ == "__main__":
     json_file_path = "forecast_data.json"
