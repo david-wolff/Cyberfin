@@ -4,34 +4,33 @@
     <meta charset="UTF-8">
     <title>Surf Forecast</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 </head>
 <body>
     <div class="container">
         <h1>Today's Surf Forecast</h1>
+        <canvas id="waveChart" width="800" height="400"></canvas> 
         {% for forecast in forecasts %}
-    <div class="forecast">
-        <strong>Time:</strong> {{ forecast.time }}<br>
-        <strong>Conditions:</strong><br>
-        - Water Temperature: {{ forecast.conditions.waterTemperature }} °C<br>
-        - Wave Direction: 
-            {% set wd = forecast.conditions.waveDirection %}
-            {{ wd }}° 
-            {{ 'N' if wd < 22.5 or wd >= 337.5 else 'NE' if wd < 67.5 else 'E' if wd < 112.5 else 'SE' if wd < 157.5 else 'S' if wd < 202.5 else 'SW' if wd < 247.5 else 'W' if wd < 292.5 else 'NW' if wd < 337.5 }}<br>
-        - Wave Height: {{ forecast.conditions.waveHeight }} meters<br>
-        - Wave Period: {{ forecast.conditions.wavePeriod }} seconds<br>
-        - Wind Direction: 
-            {% set wd = forecast.conditions.windDirection %}
-            {{ wd }}° 
-            {{ 'N' if wd < 22.5 or wd >= 337.5 else 'NE' if wd < 67.5 else 'E' if wd < 112.5 else 'SE' if wd < 157.5 else 'S' if wd < 202.5 else 'SW' if wd < 247.5 else 'W' if wd < 292.5 else 'NW' if wd < 337.5 }}<br>
-        - Wind Speed: {{ forecast.conditions.windSpeed }} m/s<br>
-    </div>
-{% else %}
-    <div>No forecast data available.</div>
-{% endfor %}
-
-
+        <div class="forecast">
+            <strong>Time:</strong> {{ forecast.time }}<br>
+            <strong>Conditions:</strong><br>
+            - Water Temperature: {{ forecast.conditions.waterTemperature }} °C<br>
+            - Wave Direction: 
+                {% set wd = forecast.conditions.waveDirection %}
+                {{ wd }}° 
+                {{ 'N' if wd < 22.5 or wd >= 337.5 else 'NE' if wd < 67.5 else 'E' if wd < 112.5 else 'SE' if wd < 157.5 else 'S' if wd < 202.5 else 'SW' if wd < 247.5 else 'W' if wd < 292.5 else 'NW' if wd < 337.5 }}<br>
+            - Wave Height: {{ forecast.conditions.waveHeight }} meters<br>
+            - Wave Period: {{ forecast.conditions.wavePeriod }} seconds<br>
+            - Wind Direction: 
+                {% set wd = forecast.conditions.windDirection %}
+                {{ wd }}° 
+                {{ 'N' if wd < 22.5 or wd >= 337.5 else 'NE' if wd < 67.5 else 'E' if wd < 112.5 else 'SE' if wd < 157.5 else 'S' if wd < 202.5 else 'SW' if wd < 247.5 else 'W' if wd < 292.5 else 'NW' if wd < 337.5 }}<br>
+            - Wind Speed: {{ forecast.conditions.windSpeed }} m/s<br>
+        </div>
+        {% else %}
+        <div>No forecast data available.</div>
+        {% endfor %}
     </div> 
-    
     
     <div class="feedback-container">
         <form action="/feedback" method="post" class="feedback-form">
@@ -45,6 +44,45 @@
             <input type="submit" value="Submit Feedback">
         </form>
     </div>
-</body>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('waveChart').getContext('2d');
+            const waveHeight = {{ chart_forecasts|map(attribute='conditions.waveHeight')|list|tojson }};
+            const wavePeriod = {{ chart_forecasts|map(attribute='conditions.wavePeriod')|list|tojson }};
+            const labels = {{ chart_forecasts|map(attribute='time')|list|tojson }};  
+        
+            const waveChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Wave Height (meters)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        data: waveHeight,
+                        fill: false,
+                    }, {
+                        label: 'Wave Period (seconds)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        data: wavePeriod,
+                        fill: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+        
+
+               
+</body>
 </html>

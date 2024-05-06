@@ -1,0 +1,5 @@
+Flask==3.0.2
+python-dotenv
+geocoder
+requests
+apscheduler
