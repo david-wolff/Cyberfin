@@ -1,12 +1,18 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #0a0a0a; /* Very dark background for deep contrast */
-    color: #e0e0ff; /* Soft light blue for general text */
+    font-family: 'Roboto', sans-serif; /* Default text */
+    background-color: #1c1c1e; /* A deep dark gray */
+    color: #ffffff; /* White text for better readability */
     margin: 0;
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+h1 {
+    font-family: 'Orbitron', sans-serif; /* Special font for headings */
+    font-size: 2.5em; /* Larger size for headings */
+    color: #0db9d7; /* Bright accent color for headings */
 }
 
 .container {
@@ -18,32 +24,22 @@ body {
     margin: 0 auto;
 }
 
-#waveChart {
-    width: 100%;
-    max-width: 800px;
-    height: 400px;
-    margin: 20px 0;
-    z-index: 1;
-}
-
 .forecast {
-    background-color: #222233; /* Dark blue background for forecast cards */
-    color: #d7d7ff; /* Light lavender text for high readability */
     width: 100%;
-    max-width: 800px;
+    max-width: 800px; /* Uniform width for all forecast boxes */
     margin: 10px 0;
     padding: 20px;
+    background-color: #2a2a2e; /* Slightly lighter than the body for contrast */
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(100, 100, 255, 0.6); /* Neon blue glow */
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    color: #e0e0e0; /* Light gray text for readability */
 }
 
 .feedback-container {
     width: 100%;
     padding: 20px;
-    background-color: #1a1a2d; /* Dark navy blue */
-    box-shadow: 0 2px 4px rgba(50, 50, 100, 0.5);
+    background-color: #333335; /* Dark gray for the feedback area */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-top: 30px;
 }
 
@@ -58,7 +54,7 @@ body {
 }
 
 .feedback-form input[type=submit] {
-    background-color: #ff0078; /* Bright neon pink for buttons */
+    background-color: #0277bd; /* Bright accent color for the submit button */
     color: white;
     padding: 10px 15px;
     border: none;
@@ -67,7 +63,19 @@ body {
     margin-top: 20px;
 }
 
-/* Enhanced hover effects for buttons */
-.feedback-form input[type=submit]:hover {
-    background-color: #ff3399; /* Lighter neon pink on hover */
+
+
+#waveChart {
+    width: 100%;
+    max-width: 800px; 
+    height: 400px;
+    margin: 20px 0;
 }
+
+#waveChart {
+    width: 100%;
+    max-width: 1200px; 
+    height: 400px;
+    margin: 20px 0;
+}
+

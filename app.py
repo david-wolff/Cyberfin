@@ -1,66 +1,64 @@
 from flask import Flask, render_template
 import json
+import pytz
 import os
+from datetime import datetime, timedelta
 from sendForecastRequest import get_and_store_forecast
-from filterRequest import average_noaa_conditions_to_file
+from filterRequest import filter_noaa_conditions_to_file
+from tide_data import fetch_tide_data, save_tide_data, get_coordinates
 
 app = Flask(__name__)
 
-def filter_for_8am(data):
-    """Filters data to include only entries at 8 AM."""
-    filtered = []
-    for entry in data:
-        if '08:00 AM' in entry['time']:
-            filtered.append(entry)
-    return filtered
-
-def can_make_api_request(raw_data_file):
-    try:
-        with open(raw_data_file, 'r') as file:
-            data = json.load(file)
-            request_count = data['meta']['requestCount']
-            daily_quota = data['meta']['dailyQuota']
-            return request_count < (daily_quota - 1)  # Ensuring we don't hit the quota
-    except FileNotFoundError:
-        return True  # If the file doesn't exist, consider that no requests have been made
-    except KeyError:
-        return False  # If the file is corrupted or improperly formatted
+def degrees_to_cardinal(d):
+    dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+    ix = int((d + 11.25) / 22.5) % 16
+    return f"{d}° {dirs[ix]}"
 
 def initialize():
     raw_data_file = "forecast_data.json"
     processed_data_file = "noaa_filtered.json"
     
-    if can_make_api_request(raw_data_file):
-        get_and_store_forecast(raw_data_file)
-        print("API request made and data updated.")
-    else:
-        print("API request limit reached. Using existing data.")   
-    average_noaa_conditions_to_file(raw_data_file, processed_data_file)
+    get_and_store_forecast(raw_data_file)
+    filter_noaa_conditions_to_file(raw_data_file, processed_data_file)
+    
+    lat, lng = get_coordinates(use_rio=True)  # Change use_rio to False to use actual IP location
+    api_key = os.getenv('STORMGLASS_API_KEY_2')
+    tides = fetch_tide_data(lat, lng, api_key)
+    save_tide_data(tides, 'tides.json')
+    print("Initialization complete")
 
-def filter_for_8am(data):
-    """Filters data to include only entries at 8 AM."""
-    filtered = []
-    for entry in data:
-        if '08:00 AM' in entry['time']:
-            filtered.append(entry)
-    return filtered
+def filter_tides(tides):
+    today = datetime.now().astimezone(pytz.timezone('America/Sao_Paulo'))
+    end_time = today + timedelta(days=2)  # End of the next two days
+    filtered_tides = []
+    for tide in tides:
+        local_time = datetime.fromisoformat(tide['time']).astimezone(pytz.timezone('America/Sao_Paulo'))
+        if today <= local_time < end_time:
+            tide['time'] = local_time.strftime('%d/%m/%y %H:%M')
+            filtered_tides.append(tide)
+    return filtered_tides
 
 @app.route('/')
 def home():
     try:
         with open('noaa_filtered.json', 'r') as file:
             forecasts = json.load(file)
-            chart_forecasts = filter_for_8am(forecasts)  # Filter data for chart
+            for forecast in forecasts:
+                forecast['conditions']['waveDirection'] = degrees_to_cardinal(forecast['conditions']['waveDirection'])
+                forecast['conditions']['windDirection'] = degrees_to_cardinal(forecast['conditions']['windDirection'])
+        
+        with open('tides.json', 'r') as file:
+            raw_tides = json.load(file)
+            tides = filter_tides(raw_tides)
+            print(f"Tides data loaded and filtered: {tides}")
     except Exception as e:
-        print(f"Failed to load forecast data: {e}")
-        forecasts = []  # Provide an empty list if there's an error
-        chart_forecasts = []  # Ensure chart data is also empty on failure
-    return render_template('forecast.html', forecasts=forecasts, chart_forecasts=chart_forecasts)
+        print(f"Failed to load forecast or tide data: {e}")
+        forecasts = []
+        tides = []
+
+    return render_template('forecast.html', forecasts=forecasts, tides=tides)
 
 initialize()
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
