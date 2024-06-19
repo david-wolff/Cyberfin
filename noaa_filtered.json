@@ -1,101 +1,112 @@
 [
     {
-        "time": "05/06/2024 08:00",
+        "time": "16/06/2024 08:00",
         "conditions": {
-            "waterTemperature": 22.51,
-            "waveDirection": 180.33,
-            "waveHeight": 1.45,
-            "wavePeriod": 10.8,
-            "windDirection": 128.37,
-            "windSpeed": 3.94
+            "waterTemperature": 21.59,
+            "waveDirection": 162.98,
+            "waveHeight": 0.42,
+            "wavePeriod": 9.82,
+            "windDirection": 351.18,
+            "windSpeed": 4.16
         }
     },
     {
-        "time": "06/06/2024 08:00",
+        "time": "17/06/2024 08:00",
         "conditions": {
-            "waterTemperature": 21.77,
-            "waveDirection": 176.84,
-            "waveHeight": 1.32,
-            "wavePeriod": 12.04,
-            "windDirection": 43.61,
-            "windSpeed": 3.01
+            "waterTemperature": 21.74,
+            "waveDirection": 113.13,
+            "waveHeight": 0.43,
+            "wavePeriod": 6.58,
+            "windDirection": 354.23,
+            "windSpeed": 4.32
         }
     },
     {
-        "time": "07/06/2024 08:00",
+        "time": "18/06/2024 08:00",
         "conditions": {
-            "waterTemperature": 21.86,
-            "waveDirection": 169.24,
-            "waveHeight": 1.07,
-            "wavePeriod": 10.5,
-            "windDirection": 9.33,
-            "windSpeed": 2.39
+            "waterTemperature": 21.79,
+            "waveDirection": 173.39,
+            "waveHeight": 0.6,
+            "wavePeriod": 15.37,
+            "windDirection": 353.73,
+            "windSpeed": 4.66
         }
     },
     {
-        "time": "08/06/2024 08:00",
+        "time": "19/06/2024 08:00",
         "conditions": {
-            "waterTemperature": 22.01,
-            "waveDirection": 163.2,
-            "waveHeight": 0.84,
-            "wavePeriod": 9.48,
-            "windDirection": 19.14,
-            "windSpeed": 2.08
-        }
-    },
-    {
-        "time": "09/06/2024 08:00",
-        "conditions": {
-            "waterTemperature": 22.04,
-            "waveDirection": 155.24,
-            "waveHeight": 0.69,
-            "wavePeriod": 8.87,
-            "windDirection": 22.69,
-            "windSpeed": 2.18
-        }
-    },
-    {
-        "time": "10/06/2024 08:00",
-        "conditions": {
-            "waterTemperature": 22.04,
-            "waveDirection": 160.28,
-            "waveHeight": 0.67,
-            "wavePeriod": 12.66,
-            "windDirection": 359.56,
-            "windSpeed": 3.42
-        }
-    },
-    {
-        "time": "11/06/2024 08:00",
-        "conditions": {
-            "waterTemperature": 22.24,
-            "waveDirection": 160.63,
-            "waveHeight": 0.55,
-            "wavePeriod": 13.04,
-            "windDirection": 351.67,
-            "windSpeed": 4.67
-        }
-    },
-    {
-        "time": "12/06/2024 08:00",
-        "conditions": {
-            "waterTemperature": 21.82,
-            "waveDirection": 178.81,
+            "waterTemperature": 21.81,
+            "waveDirection": 175.35,
             "waveHeight": 0.74,
-            "wavePeriod": 13.89,
-            "windDirection": 343.5,
-            "windSpeed": 1.95
+            "wavePeriod": 12.03,
+            "windDirection": 355.09,
+            "windSpeed": 3.71
         }
     },
     {
-        "time": "13/06/2024 08:00",
+        "time": "20/06/2024 08:00",
         "conditions": {
-            "waterTemperature": 21.82,
-            "waveDirection": 178.68,
-            "waveHeight": 1.16,
-            "wavePeriod": 11.43,
-            "windDirection": 34.2,
-            "windSpeed": 2.03
+            "waterTemperature": 22.05,
+            "waveDirection": 176.54,
+            "waveHeight": 0.58,
+            "wavePeriod": 10.27,
+            "windDirection": 357.46,
+            "windSpeed": 3.98
+        }
+    },
+    {
+        "time": "21/06/2024 08:00",
+        "conditions": {
+            "waterTemperature": 22.26,
+            "waveDirection": 172.99,
+            "waveHeight": 0.59,
+            "wavePeriod": 11.11,
+            "windDirection": 290.26,
+            "windSpeed": 2.62
+        }
+    },
+    {
+        "time": "22/06/2024 08:00",
+        "conditions": {
+            "waterTemperature": 21.67,
+            "waveDirection": 172.87,
+            "waveHeight": 0.43,
+            "wavePeriod": 9.77,
+            "windDirection": 354.07,
+            "windSpeed": 1.4
+        }
+    },
+    {
+        "time": "23/06/2024 08:00",
+        "conditions": {
+            "waterTemperature": 21.68,
+            "waveDirection": 177.99,
+            "waveHeight": 0.91,
+            "wavePeriod": 11.06,
+            "windDirection": 359.57,
+            "windSpeed": 3.86
+        }
+    },
+    {
+        "time": "24/06/2024 08:00",
+        "conditions": {
+            "waterTemperature": 21.91,
+            "waveDirection": 172.08,
+            "waveHeight": 0.71,
+            "wavePeriod": 10.73,
+            "windDirection": 358.85,
+            "windSpeed": 3.9
+        }
+    },
+    {
+        "time": "25/06/2024 08:00",
+        "conditions": {
+            "waterTemperature": 22.29,
+            "waveDirection": 167.59,
+            "waveHeight": 0.77,
+            "wavePeriod": 11.71,
+            "windDirection": 332.13,
+            "windSpeed": 2.36
         }
     }
 ]

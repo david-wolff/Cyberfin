@@ -3,80 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>Surf Forecast</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Pacifico&family=Raleway:wght@400;500&family=Sail&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Cyberfin</h1>
-        <canvas id="waveChart" width="3000" height="600"></canvas>
-        <canvas id="tideChart" width="2500" height="600"></canvas>
-
-        {% for forecast in forecasts %}
-        <div class="forecast">
-            <strong>Time:</strong> {{ forecast.time }}<br>
-            <strong>Conditions:</strong><br>
-            - Water Temperature: {{ forecast.conditions.waterTemperature }} °C<br>
-            - Wave Direction: {{ forecast.conditions.waveDirection }}<br>
-            - Wave Height: {{ forecast.conditions.waveHeight }} meters<br>
-            - Wave Period: {{ forecast.conditions.wavePeriod }} seconds<br>
-            - Wind Direction: {{ forecast.conditions.windDirection }}<br>
-            - Wind Speed: {{ forecast.conditions.windSpeed }} m/s<br>
+        <canvas id="forecastChart" width="800" height="400"></canvas>
+        <div class="forecasts">
+            {% for forecast in forecasts %}
+            <div class="forecast">
+                <strong>Date:</strong> {{ forecast.date }}<br>
+                <strong>Time:</strong> {{ forecast.time }}<br>
+                <strong>Conditions:</strong><br>
+                - Water Temperature: {{ forecast.water_temperature }} °C<br>
+                - Wave Direction: {{ forecast.wave_direction }}° ({{ forecast.wave_direction_cardinal }})<br>
+                - Wave Height: {{ forecast.wave_height }} meters<br>
+                - Wave Period: {{ forecast.wave_period }} seconds<br>
+                - Wind Direction: {{ forecast.wind_direction }}° ({{ forecast.wind_direction_cardinal }})<br>
+                - Wind Speed: {{ forecast.wind_speed }} m/s<br>
+            </div>
+            {% else %}
+            <div>No forecast data available.</div>
+            {% endfor %}
         </div>
-        {% else %}
-        <div>No forecast data available.</div>
-        {% endfor %}
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const waveCtx = document.getElementById('waveChart').getContext('2d');
-            const tideCtx = document.getElementById('tideChart').getContext('2d');
-
-            const waveLabels = {{ forecasts|map(attribute='time')|list|tojson }};
-            const waveHeightData = {{ forecasts|map(attribute='conditions.waveHeight')|list|tojson }};
-            const wavePeriodData = {{ forecasts|map(attribute='conditions.wavePeriod')|list|tojson }};
-            const tideLabels = {{ tides|map(attribute='time')|list|tojson }};
-            const tideHeightData = {{ tides|map(attribute='height')|list|tojson }};
-
-            console.log("Wave Labels:", waveLabels);
-            console.log("Wave Height Data:", waveHeightData);
-            console.log("Wave Period Data:", wavePeriodData);
-            console.log("Tide Labels:", tideLabels);
-            console.log("Tide Height Data:", tideHeightData);
-
-            const waveChart = new Chart(waveCtx, {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            const forecastChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: waveLabels,
+                    labels: {{ chart_data.labels|tojson }},
                     datasets: [{
-                        label: 'Wave Height (meters)',
+                        label: 'Average Wave Height (meters)',
                         borderColor: 'rgb(255, 99, 132)',
                         backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        data: waveHeightData,
+                        data: {{ chart_data.wave_heights|tojson }},
                         fill: false
                     }, {
-                        label: 'Wave Period (seconds)',
+                        label: 'Average Wave Period (seconds)',
                         borderColor: 'rgb(54, 162, 235)',
                         backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        data: wavePeriodData,
+                        data: {{ chart_data.wave_periods|tojson }},
                         fill: false
                     }]
-                }
-            });
-
-            const tideChart = new Chart(tideCtx, {
-                type: 'line',
-                data: {
-                    labels: tideLabels,
-                    datasets: [{
-                        label: 'Tide Level (meters)',
-                        borderColor: 'rgb(75, 192, 192)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                        data: tideHeightData,
-                        fill: false
-                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
                 }
             });
         });

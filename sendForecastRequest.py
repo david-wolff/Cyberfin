@@ -1,4 +1,3 @@
-import json
 import requests
 import os
 import geocoder
@@ -6,21 +5,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv
+from app import store_data
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
-def update_needed(json_file_path):
-    try:
-        with open(json_file_path, 'r') as f:
-            data = json.load(f)
-            last_request_time = datetime.strptime(data['meta']['end'], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
-            now = datetime.now(timezone.utc)
-            return now - last_request_time > timedelta(hours=8)  # Allow updates every 8 hours
-    except (FileNotFoundError, ValueError, KeyError, json.JSONDecodeError):
-        return True
-
-def get_and_store_forecast(output_file): 
+def fetch_forecast():
     try:
         location = geocoder.ip('me')
         lat, lng = location.latlng  
@@ -34,29 +24,48 @@ def get_and_store_forecast(output_file):
         response.raise_for_status() 
         
         data = response.json()
-        with open(output_file, 'w') as file: 
-            json.dump(data, file, indent=4)
-        logging.info(f"Forecast data has been saved to {output_file}") 
+        return data
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to get forecast data: {e}")
+        return None
+
+def filter_and_store_forecast(data):
+    current_datetime = datetime.now()
+    end_datetime = current_datetime + timedelta(days=10)
+    desired_time = "08:00"
+
+    filtered_data = []
+
+    for hour in data['hours']:
+        hour_time = datetime.strptime(hour['time'], "%Y-%m-%dT%H:%M:%S+00:00")
+        if current_datetime <= hour_time <= end_datetime:
+            if hour_time.strftime("%H:%M") == desired_time:
+                filtered_entry = {
+                    'time': hour_time.strftime("%Y-%m-%d %H:%M:%S"),
+                    'water_temperature': hour['waterTemperature']['noaa'],
+                    'wave_direction': hour['waveDirection']['noaa'],
+                    'wave_height': hour['waveHeight']['noaa'],
+                    'wave_period': hour['wavePeriod']['noaa'],
+                    'wind_direction': hour['windDirection']['noaa'],
+                    'wind_speed': hour['windSpeed']['noaa']
+                }
+                filtered_data.append(filtered_entry)
+
+    store_data(filtered_data)
+    logging.info("Filtered forecast data has been stored in the database")
+
+def update_forecast():
+    data = fetch_forecast()
+    if data:
+        filter_and_store_forecast(data)
 
 def schedule_requests():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(lambda: request_forecast_if_needed('forecast_data.json'), 'cron', hour=8)
-    scheduler.add_job(lambda: request_forecast_if_needed('forecast_data.json'), 'cron', hour=16)
-    scheduler.add_job(lambda: request_forecast_if_needed('forecast_data.json'), 'cron', hour=22)
+    scheduler.add_job(update_forecast, 'cron', hour=8)
+    scheduler.add_job(update_forecast, 'cron', hour=16)
+    scheduler.add_job(update_forecast, 'cron', hour=22)
     scheduler.start()
-
-def request_forecast_if_needed(json_file_path):
-    if update_needed(json_file_path):
-        get_and_store_forecast(json_file_path)
-    else:
-        logging.info("No update needed. Forecast data is up-to-date.")
 
 if __name__ == "__main__":
     schedule_requests()
-    json_file_path = "forecast_data.json"
-    if update_needed(json_file_path):
-        get_and_store_forecast(json_file_path)
-    else:
-        print("No update needed. Forecast data is up-to-date.")
+    update_forecast()
